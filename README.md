@@ -1,2 +1,2 @@
-# Clone
-Practice some random clonecoding projects
+# ClonePractice
+Clone coding some random projects with Django
