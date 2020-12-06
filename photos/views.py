@@ -1,7 +1,9 @@
 from django.http import HttpResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 
 # Create your views here.
+from django.views.decorators.csrf import csrf_exempt
+
 from .models import Photo
 from .forms import PhotoForm
 
@@ -23,10 +25,20 @@ def detail(request, pk):
 
     return HttpResponse('\n'.join(messages))
 
+@csrf_exempt
 def create(request):
-    form = PhotoForm()
+    if request.method == "GET":
+        form = PhotoForm()
+    elif request.method == "POST":
+        form = PhotoForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            obj = form.save()
+            return redirect(obj)
+
     ctx = {
         'form': form,
     }
-    return render(request, 'edit.html',ctx)
+
+    return render(request, 'photos/edit.html', ctx)
 

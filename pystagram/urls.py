@@ -16,8 +16,8 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls import url
 from django.conf.urls.static import static
-from django.contrib import admin
-from django.urls import path, re_path
+from django.contrib import admin, auth
+from django.urls import path, re_path, include
 
 from photos.views import ping
 from photos.views import detail
@@ -25,9 +25,27 @@ from photos.views import create
 
 urlpatterns = [
     path('', ping),
-    url(r'^admin/', admin.site.urls),
-    url(r'^photos/(?P<pk>[0-9]+)/$', detail, name='detail'),
-    url(r'^photos/upload/$', create, name='create'),
+    path('admin/', admin.site.urls),
+    re_path(r'^photos/(?P<pk>[0-9]+)/$', detail, name='detail'),
+    re_path(r'^photos/upload/$', create, name='create'),
+    # re_path(
+    #     r'^accounts/login/',
+    #     auth.login,
+    #
+    #     kwargs={'template_name': 'login.html'
+    #             },
+    #     name='login',
+    # ),
+    # re_path(
+    #     r'^accounts/logout/',
+    #     auth.logout,
+    #     kwargs={
+    #         'next_page': settings.LOGIN_URL,
+    #     },
+    #     name='logout',
+    #
+    # ),
+    path('accounts/',include('django.contrib.auth.urls')),
 ]
 
-urlpatterns += static('upload_files', document_root=settings.MEDIA_ROOT)
+urlpatterns += static('/upload_files/', document_root=settings.MEDIA_ROOT)
