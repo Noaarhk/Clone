@@ -25,6 +25,7 @@ def detail(request, pk):
 
     return HttpResponse('\n'.join(messages))
 
+
 @csrf_exempt
 def create(request):
     if request.method == "GET":
@@ -33,7 +34,9 @@ def create(request):
         form = PhotoForm(request.POST, request.FILES)
 
         if form.is_valid():
-            obj = form.save()
+            obj = form.save(commit=False)
+            obj.user = request.user
+            obj.user.save()
             return redirect(obj)
 
     ctx = {
@@ -41,4 +44,3 @@ def create(request):
     }
 
     return render(request, 'photos/edit.html', ctx)
-

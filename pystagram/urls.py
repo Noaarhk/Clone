@@ -18,21 +18,24 @@ from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib import admin, auth
 from django.urls import path, re_path, include
+from django.views.generic import TemplateView
 
 from photos.views import ping
 from photos.views import detail
 from photos.views import create
 
 urlpatterns = [
+    path('',TemplateView.as_view(template_name="login/index.html")),
     path('', ping),
     path('admin/', admin.site.urls),
     re_path(r'^photos/(?P<pk>[0-9]+)/$', detail, name='detail'),
     re_path(r'^photos/upload/$', create, name='create'),
+
     # re_path(
     #     r'^accounts/login/',
     #     auth.login,
     #
-    #     kwargs={'template_name': 'login.html'
+    #     {'template_name': 'login.html'
     #             },
     #     name='login',
     # ),
@@ -45,7 +48,9 @@ urlpatterns = [
     #     name='logout',
     #
     # ),
-    path('accounts/',include('django.contrib.auth.urls')),
+    # path('accounts/',include('django.contrib.auth.urls')),
+    path('accounts/',include('allauth.urls')),
+
 ]
 
 urlpatterns += static('/upload_files/', document_root=settings.MEDIA_ROOT)
