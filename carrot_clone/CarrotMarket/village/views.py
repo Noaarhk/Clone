@@ -37,7 +37,7 @@ class ArticleViewSet(viewsets.GenericViewSet):
         articles = Article.objects.filter(article_writer_id=user, title=title)
 
         if articles.exists():
-            return Response({"error": "article with same writer and title is invalid."},
+            return Response({"error": "cannot post an article with same title."},
                             status=status.HTTP_400_BAD_REQUEST)
 
         serializer = self.get_serializer(data=request.data)
