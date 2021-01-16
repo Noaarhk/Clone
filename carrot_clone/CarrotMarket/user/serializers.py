@@ -11,7 +11,6 @@ from user.models import UserProfile
 
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
-    user_type = serializers.CharField(write_only=True, allow_blank=True, required=False, default = 'django')
     email = serializers.EmailField(allow_blank=False)
     password = serializers.CharField(write_only=True)
     first_name = serializers.CharField(required=False)
@@ -19,6 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
     last_login = serializers.DateTimeField(read_only=True)
     joined_at = serializers.DateTimeField(read_only=True)
     userprofile = serializers.SerializerMethodField()
+    user_type = serializers.ChoiceField(write_only=True, allow_null=True, required=False, choices=UserProfile.USER_TYPE)
     area = serializers.CharField(write_only=True, allow_blank=True, required=False)
     nickname = serializers.CharField(write_only=True, allow_blank=True, required=False)
     phone = serializers.CharField(write_only=True,
@@ -30,6 +30,7 @@ class UserSerializer(serializers.ModelSerializer):
                                                              )
                                               ]
                                   )
+    profile_pics = serializers.ImageField(write_only=True, required=False, allow_null=True)
 
     class Meta:
         model = User
@@ -47,10 +48,12 @@ class UserSerializer(serializers.ModelSerializer):
             'area',
             'nickname',
             'phone',
+            'profile_pics',
         )
 
     def get_userprofile(self, user):
-        return UserProfileSerializer(user.userprofile, context=self.context).data #여기서 오류 AttributeError: 'collections.OrderedDict' object has no attribute 'userprofile' 넘겨주는 값 잘못되었
+        return UserProfileSerializer(user.userprofile,
+                                     context=self.context).data
 
     def validate_password(self, value):
         return make_password(value)
@@ -66,20 +69,23 @@ class UserSerializer(serializers.ModelSerializer):
             api_exception = serializers.ValidationError("First name or last name should not have number.")
             api_exception.status_code = status.HTTP_400_BAD_REQUEST
             raise api_exception
+        # profile_serializer = UserProfileSerializer(data=data, context=self.context)
+        # profile_serializer.is_valid(raise_exception=True)
 
-        profile_serializer = UserProfileSerializer(data=data, context=self.context)
-        profile_serializer.is_valid(raise_exception=True)
+
+
+
         return data
 
     @transaction.atomic
     def create(self, validated_data):
-        area = validated_data.pop('area', '')
-        nickname = validated_data.pop('nickname', '')
-        phone = validated_data.pop('phone', '')
-        user_type = validated_data.pop('user_type', '')
+        validated_data.pop('area', '')
+        validated_data.pop('nickname', '')
+        validated_data.pop('phone', '')
+        validated_data.pop('user_type', None)
+        profile_pics = validated_data.pop('profile_pics', None)
         user = super(UserSerializer, self).create(validated_data)
         Token.objects.create(user=user)
-        UserProfile.objects.create(user=user, area=area, nickname=nickname, phone=phone, user_type = user_type)
 
         return user
 
@@ -87,7 +93,7 @@ class UserSerializer(serializers.ModelSerializer):
         area = validated_data.get('area')
         nickname = validated_data.get('nickname')
         phone = validated_data.get('phone')
-#        user_type = validated_data.pop('user_type', '')
+        # user_type = validated_data.pop('user_type', '')
 
         profile = user.userprofile
         if area is not None:
@@ -96,24 +102,14 @@ class UserSerializer(serializers.ModelSerializer):
             profile.nickname = nickname
         if phone is not None:
             profile.phone = phone
-#        if user_type is not None:
-#            profile.user_type = user_type
+        #        if user_type is not None:
+        #            profile.user_type = user_type
         profile.save()
 
         return super(UserSerializer, self).update(user, validated_data)
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    user_type = serializers.CharField(allow_blank=True, required=False, default = 'django')
-    area = serializers.CharField(allow_blank=True, required=False)
-    nickname = serializers.CharField(allow_blank=True, required=False)
-    phone = serializers.CharField(allow_blank=True, max_length=13,
-                                  required=False,
-                                  validators=[RegexValidator(regex=r'^[0-9]{3}-([0-9]{3}|[0-9]{4})-[0-9]{4}$',
-                                                             message="Phone number must be entered in the format '000-0000-0000'",
-                                                             )
-                                              ]
-                                  )
 
     class Meta:
         model = UserProfile
@@ -123,4 +119,5 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'area',
             'nickname',
             'phone',
+            'profile_pics',
         ]

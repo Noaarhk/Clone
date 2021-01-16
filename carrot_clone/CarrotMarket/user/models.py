@@ -5,6 +5,13 @@ from django.db import models
 class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name='userprofile', on_delete=models.CASCADE)
     area = models.CharField(max_length=20, blank=True)  # ToBeDiscussed
-    nickname = models.CharField(max_length=10, db_index=True, blank=True)
-    phone = models.CharField(max_length=13, db_index=True, blank=True)
-    user_type = models.CharField(max_length=10, blank=True, default='django')
+    nickname = models.CharField(max_length=10, db_index=True, blank=True, unique=True)
+    phone = models.CharField(max_length=13, db_index=True, blank=True, unique=True)
+    # user_type = models.CharField(max_length=10, blank=True, default='django')
+    USER_TYPE = (
+        (1, 'django'),
+        (2, 'kakao'),
+    )
+
+    user_type = models.PositiveSmallIntegerField(choices=USER_TYPE, default=1, null=True)
+    profile_pics = models.ImageField(default='default.jpg')

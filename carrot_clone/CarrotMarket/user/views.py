@@ -13,7 +13,6 @@ from .models import User, UserProfile
 import requests
 
 
-
 class UserViewSet(viewsets.GenericViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -27,11 +26,9 @@ class UserViewSet(viewsets.GenericViewSet):
     # POST /user/ 회원가입
     def create(self, request):
         data = request.data
-        usertype = request.POST.get('user_type', 'django')
-        if usertype != 'kakao' and usertype != 'django':
-            return Response({"error": "wrong usertype: usertype must be 'django' or 'kakao'"}, status=status.HTTP_400_BAD_REQUEST)
-        if usertype =='kakao':
-            access_token= request.POST.get('access_token', '')
+        usertype = request.data.get('user_type')
+        if usertype == 2:
+            access_token = request.POST.get('access_token', '')
 
             if access_token == '' or None:
                 return Response({"error": "Received no access token in request"}, status=status.HTTP_400_BAD_REQUEST)
@@ -45,17 +42,17 @@ class UserViewSet(viewsets.GenericViewSet):
             if profile_json == None:
                 return Response({"error": "Received no response from Kakao database"}, status=status.HTTP_404_NOT_FOUND)
 
-            try:# parsing json
+            try:  # parsing json
                 kakao_account = profile_json.get("kakao_account")
                 email = kakao_account.get("email", None)
                 profile = kakao_account.get("profile")
                 username = profile.get("nickname")
- #               profile_image = profile.get("thumbnail_image_url")
+            #               profile_image = profile.get("thumbnail_image_url")
             except KeyError:
                 return Response({"error": "Need to agree to terms"}, status=status.HTTP_400_BAD_REQUEST)
 
-            if (User.objects.filter(username=username).exists()): #기존에 가입된 유저가 카카오 로그인
-                user = User.objects.get(username = username)
+            if (User.objects.filter(username=username).exists()):  # 기존에 가입된 유저가 카카오 로그인
+                user = User.objects.get(username=username)
                 login(request, user)
 
                 if usertype == 'django':
@@ -68,9 +65,19 @@ class UserViewSet(viewsets.GenericViewSet):
                 data['token'] = token.key
 
                 return Response(data, status=status.HTTP_200_OK)
-            else: #신규 유저의 카카오 로그인
+            else:  # 신규 유저의 카카오 로그인
                 data = {"username": username, "email": email, "user_type": 'kakao'}  ###
-#               data['profile_image'] = profile_image
+        #               data['profile_image'] = profile_image
+
+        area = request.data.get('area')
+        nickname = request.data.get('nickname')
+        phone = request.data.get('phone')
+
+        if UserProfile.objects.filter(nickname=nickname):
+            return Response({"error": "A user with that Nickname already exists."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if UserProfile.objects.filter(phone=phone):
+            return Response({"error": "A user with that Phone Number already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
@@ -78,6 +85,12 @@ class UserViewSet(viewsets.GenericViewSet):
             user = serializer.save()
         except IntegrityError:
             return Response({"error": "A user with that username already exists."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        try:
+            user_profile = UserProfile.objects.create(user_id=user.id, area=area, nickname=nickname, phone=phone)
+        except IntegrityError:
+            return Response({"error": "A user with that nickname or phone number already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
         login(request, user)
 
@@ -105,7 +118,7 @@ class UserViewSet(viewsets.GenericViewSet):
     @action(detail=False, methods=['POST'])  # 로그아웃
     def logout(self, request):
         logout(request)
-        return Response()
+        return Response({"message":"Successfully logged out."}, status=status.HTTP_200_OK)
 
     # Get /user/{user_id} # 유저 정보 가져오기(나 & 남)
     def retrieve(self, request, pk=None):
