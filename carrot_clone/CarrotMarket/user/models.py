@@ -14,4 +14,4 @@ class UserProfile(models.Model):
     )
 
     user_type = models.PositiveSmallIntegerField(choices=USER_TYPE, default=1, null=True)
-    profile_pics = models.ImageField(default='default.jpg')
+    profile_pics = models.ImageField(default='default.jpg', upload_to='')
