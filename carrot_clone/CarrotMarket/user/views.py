@@ -77,7 +77,8 @@ class UserViewSet(viewsets.GenericViewSet):
             return Response({"error": "A user with that Nickname already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
         if UserProfile.objects.filter(phone=phone):
-            return Response({"error": "A user with that Phone Number already exists."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "A user with that Phone Number already exists."},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
@@ -86,11 +87,11 @@ class UserViewSet(viewsets.GenericViewSet):
         except IntegrityError:
             return Response({"error": "A user with that username already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
-
         try:
             user_profile = UserProfile.objects.create(user_id=user.id, area=area, nickname=nickname, phone=phone)
         except IntegrityError:
-            return Response({"error": "A user with that nickname or phone number already exists."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "A user with that nickname or phone number already exists."},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         login(request, user)
 
@@ -118,7 +119,7 @@ class UserViewSet(viewsets.GenericViewSet):
     @action(detail=False, methods=['POST'])  # 로그아웃
     def logout(self, request):
         logout(request)
-        return Response({"message":"Successfully logged out."}, status=status.HTTP_200_OK)
+        return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
 
     # Get /user/{user_id} # 유저 정보 가져오기(나 & 남)
     def retrieve(self, request, pk=None):

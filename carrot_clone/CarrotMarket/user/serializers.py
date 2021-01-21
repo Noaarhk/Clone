@@ -72,9 +72,6 @@ class UserSerializer(serializers.ModelSerializer):
         # profile_serializer = UserProfileSerializer(data=data, context=self.context)
         # profile_serializer.is_valid(raise_exception=True)
 
-
-
-
         return data
 
     @transaction.atomic
@@ -110,7 +107,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = UserProfile
         fields = [
