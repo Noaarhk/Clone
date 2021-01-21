@@ -13,6 +13,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     userprofile = serializers.SerializerMethodField()
     like_count = serializers.IntegerField(read_only=True)
     article_id = serializers.ReadOnlyField(source='id')
+    images = serializers.ImageField(required=False, allow_null=True, use_url=True)
 
     class Meta:
         model = Article
@@ -24,6 +25,8 @@ class ArticleSerializer(serializers.ModelSerializer):
             'contents',
             'category',
             'like_count',
+            'images',
+
         )
 
     def get_userprofile(self, article):
