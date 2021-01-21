@@ -72,7 +72,8 @@ class UserViewSet(viewsets.GenericViewSet):
         area = request.data.get('area')
         nickname = request.data.get('nickname')
         phone = request.data.get('phone')
-        profile_pics = request.data.get('profile_pics')
+        if request.data.get('profile_pics') is not None:
+            profile_pics = request.data.get('profile_pics')
 
         if UserProfile.objects.filter(nickname=nickname):
             return Response({"error": "A user with that Nickname already exists."}, status=status.HTTP_400_BAD_REQUEST)
@@ -89,7 +90,8 @@ class UserViewSet(viewsets.GenericViewSet):
             return Response({"error": "A user with that username already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            user_profile = UserProfile.objects.create(user_id=user.id, area=area, nickname=nickname, phone=phone, profile_pics=profile_pics )
+            user_profile = UserProfile.objects.create(user_id=user.id, area=area, nickname=nickname, phone=phone,
+                                                      profile_pics=profile_pics)
         except IntegrityError:
             return Response({"error": "A user with that nickname or phone number already exists."},
                             status=status.HTTP_400_BAD_REQUEST)
