@@ -2,6 +2,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import transaction
+from requests import Response
 from rest_framework import serializers, status
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import ValidationError
@@ -61,6 +62,7 @@ class UserSerializer(serializers.ModelSerializer):
     def validate(self, data):
         first_name = data.get('first_name')
         last_name = data.get('last_name')
+
         if bool(first_name) ^ bool(last_name):
             api_exception = serializers.ValidationError("First name and last name should appear together.")
             api_exception.status_code = status.HTTP_400_BAD_REQUEST
@@ -69,6 +71,7 @@ class UserSerializer(serializers.ModelSerializer):
             api_exception = serializers.ValidationError("First name or last name should not have number.")
             api_exception.status_code = status.HTTP_400_BAD_REQUEST
             raise api_exception
+
         # profile_serializer = UserProfileSerializer(data=data, context=self.context)
         # profile_serializer.is_valid(raise_exception=True)
 
@@ -80,7 +83,7 @@ class UserSerializer(serializers.ModelSerializer):
         validated_data.pop('nickname', '')
         validated_data.pop('phone', '')
         validated_data.pop('user_type', None)
-        profile_pics = validated_data.pop('profile_pics', None)
+        validated_data.pop('profile_pics', None)
         user = super(UserSerializer, self).create(validated_data)
         Token.objects.create(user=user)
 

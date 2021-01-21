@@ -75,7 +75,7 @@ class UserViewSet(viewsets.GenericViewSet):
         if request.data.get('profile_pics') is not None:
             profile_pics = request.data.get('profile_pics')
 
-        if UserProfile.objects.filter(nickname=nickname):
+        if UserProfile.objects.filter(nickname__iexact=nickname):
             return Response({"error": "A user with that Nickname already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
         if UserProfile.objects.filter(phone=phone):
@@ -95,6 +95,7 @@ class UserViewSet(viewsets.GenericViewSet):
         except IntegrityError:
             return Response({"error": "A user with that nickname or phone number already exists."},
                             status=status.HTTP_400_BAD_REQUEST)
+
 
         login(request, user)
 
@@ -147,6 +148,9 @@ class UserViewSet(viewsets.GenericViewSet):
         try:
             serializer.save()
         except IntegrityError:
-            return Response({"error": "Nickname or Phone number is already occupied"})
+
+            return Response({"error": "That Nickname or Phone number is already occupied"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
 
         return Response(serializer.data)
