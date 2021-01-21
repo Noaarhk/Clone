@@ -19,10 +19,10 @@ class UserSerializer(serializers.ModelSerializer):
     joined_at = serializers.DateTimeField(read_only=True)
     userprofile = serializers.SerializerMethodField()
     user_type = serializers.ChoiceField(write_only=True, allow_null=True, required=False, choices=UserProfile.USER_TYPE)
-    area = serializers.CharField(write_only=True, allow_blank=True, required=False)
-    nickname = serializers.CharField(write_only=True, allow_blank=True, required=False)
+    area = serializers.CharField(write_only=True, allow_blank=False, required=False)
+    nickname = serializers.CharField(write_only=True, allow_blank=False, required=False)
     phone = serializers.CharField(write_only=True,
-                                  allow_blank=True,
+                                  allow_blank=False,
                                   max_length=13,
                                   required=False,
                                   validators=[RegexValidator(regex=r'^[0-9]{3}-([0-9]{3}|[0-9]{4})-[0-9]{4}$',
@@ -90,6 +90,8 @@ class UserSerializer(serializers.ModelSerializer):
         area = validated_data.get('area')
         nickname = validated_data.get('nickname')
         phone = validated_data.get('phone')
+        profile_pics = validated_data.get('profile_pics')
+
         # user_type = validated_data.pop('user_type', '')
 
         profile = user.userprofile
@@ -99,6 +101,8 @@ class UserSerializer(serializers.ModelSerializer):
             profile.nickname = nickname
         if phone is not None:
             profile.phone = phone
+        if profile_pics is not None:
+            profile.profile_pics = profile_pics
         #        if user_type is not None:
         #            profile.user_type = user_type
         profile.save()
