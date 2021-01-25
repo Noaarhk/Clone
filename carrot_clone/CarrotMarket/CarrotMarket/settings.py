@@ -24,7 +24,12 @@ SECRET_KEY = 'v)p94(gncbj@6m^jqj0pv6u_@1)5@&h&bqljswpt&%kz&+x*y-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+	'52.14.99.244',
+	'ec2-52-14-99-244.us-east-2.compute.amazonaws.com',
+	'localhost',
+	'127.0.0.1',
+]
 
 # Application definition
 
@@ -81,9 +86,9 @@ WSGI_APPLICATION = 'CarrotMarket.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'localhost',
+        'HOST': 'my-database.c8rxsbbexj0l.us-east-2.rds.amazonaws.com',
         'PORT': 3306,
-        'NAME': 'waffle_team6',
+        'NAME': 'my_carrot',
         'USER': 'team6',
         'PASSWORD': 'carrot',
     }
