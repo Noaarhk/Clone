@@ -82,7 +82,7 @@ class ArticleViewSet(viewsets.GenericViewSet):
 
         data = ArticleSerializer(articles, many=True).data
 
-        return Response(data)
+        return Response(data, status=status.HTTP_200_OK)
 
     def destroy(self, request, pk=None):
         user = request.user
