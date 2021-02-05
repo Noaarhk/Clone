@@ -151,8 +151,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-AWS_ACCESS_KEY_ID = 'AKIA33ITKJYIMXVS2VN4'
-AWS_SECRET_ACCESS_KEY = '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'
+
 
 AWS_REGION = 'ap-northeast-2'
 AWS_STORAGE_BUCKET_NAME = 'carrot-bucket'
