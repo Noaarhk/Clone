@@ -25,10 +25,10 @@ SECRET_KEY = 'v)p94(gncbj@6m^jqj0pv6u_@1)5@&h&bqljswpt&%kz&+x*y-'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-	'52.14.99.244',
-	'ec2-52-14-99-244.us-east-2.compute.amazonaws.com',
-	'localhost',
-	'127.0.0.1',
+    '52.14.99.244',
+    'ec2-52-14-99-244.us-east-2.compute.amazonaws.com',
+    'localhost',
+    '127.0.0.1',
 ]
 
 # Application definition
@@ -48,6 +48,8 @@ INSTALLED_APPS = [
 
     'product',
     'village',
+
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -128,8 +130,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -145,5 +145,29 @@ REST_FRAMEWORK = {
     )
 
 }
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+AWS_ACCESS_KEY_ID = 'AKIA33ITKJYIMXVS2VN4'
+AWS_SECRET_ACCESS_KEY = '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'
+
+AWS_REGION = 'ap-northeast-2'
+AWS_STORAGE_BUCKET_NAME = 'carrot-bucket'
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.%s.amazonaws.com' % (
+    AWS_STORAGE_BUCKET_NAME, AWS_REGION)
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 102400000 # value in bytes 1MB here
+FILE_UPLOAD_MAX_MEMORY_SIZE = 102400000
+
+
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_DEFAULT_ACL = 'public-read'
+AWS_LOCATION = 'uploads'
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
